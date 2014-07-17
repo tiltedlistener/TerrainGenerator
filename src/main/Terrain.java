@@ -47,42 +47,24 @@ public class Terrain {
 		double scale = roughness * size;
 		if (half < 1) return;
 		
-		System.out.println(scale);
-		
 		for(y = half; y < this.max; y+= size) {
 			for (x = half; x < this.max; x += size) {
-				square(x,y,half, rand.nextInt() * scale * 2 - scale);
+				square(x,y, half, rand.nextFloat() * scale * 2 - scale);
 			}
 		}
 		
 		for (y = 0; y <= this.max; y+=half) {
 			for (x = (y+half) % size; x <= this.max; x += size) {
-				diamond(x, y, half, rand.nextInt() * scale * 2 * - scale);
+				diamond(x, y, half, rand.nextFloat() * scale * 2 * - scale);
 			}
 		}
 		
 		this.divide(size / 2, roughness);
 	}
 	
-	public int average(int[] values) {
-		int length = values.length;
+	public void square(int x, int y, int sze, double offset) {	
+		System.out.println(this.get(x - sze, y - sze));
 		
-		List<Integer> valid = new ArrayList<Integer>();
-		for(int i=0;i<length;i++) {
-			if (values[i] != -1) {
-				valid.add(values[i]);
-			}
-		}
-		
-		int sum = 0;
-		for(int j=0;j<valid.size();j++) {
-			sum+= valid.get(j);
-		}
-		
-		return sum/valid.size();
-	}
-	
-	public void square(int x, int y, int sze, double offset) {		
 		int[] toAvg = {
 		           this.get(x - sze, y - sze),   // upper left
 		           this.get(x + sze, y - sze),   // upper right
@@ -105,6 +87,24 @@ public class Terrain {
 		int ave = this.average(toAvg);
 		this.set(x, y, ave + (int)offset);
 	}
+	
+	public int average(int[] values) {
+		int length = values.length;
+	
+		List<Integer> valid = new ArrayList<Integer>();
+		for(int i=0;i<length;i++) {
+			if (values[i] != -1) {
+				valid.add(values[i]);
+			}
+		}
+		
+		int sum = 0;
+		for(int j=0;j<valid.size();j++) {
+			sum+= valid.get(j);
+		}
+		
+		return sum/valid.size();
+	}	
 	
 	public void draw(int width, int height) {
 		this.width = width;
