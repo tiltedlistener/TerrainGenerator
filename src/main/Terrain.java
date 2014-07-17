@@ -1,7 +1,6 @@
 package main;
 
 import java.util.*;
-import java.awt.Graphics2D;
 import java.awt.Color;
 
 public class Terrain {
@@ -9,29 +8,31 @@ public class Terrain {
 	public int[] map;
 	public int size;
 	public int max;
-	public Graphics2D g2d;
+	public int width;
+	public int height;
+	public TerrainGeneration generator;
 	
 	public Random rand;
 	
-	public Terrain(double detail, Graphics2D _g2d) {
+	public Terrain(double detail, TerrainGeneration _generator) {
 		rand = new Random();
 		
-		this.g2d = _g2d;
-		this.size = (int)Math.pow(2, detail) + 1; 
+		this.generator = _generator;
+		this.size = (int)Math.pow(2, detail) + 1; 		
 		this.max = this.size - 1;
 		this.map = new int[(this.size * this.size)];
 	}
 	
 	public int get(int x, int y) {
 		if (x<0 || x > this.max || y<0 || y > this.max) return -1;
-		return this.map[(int)(x + this.size*y)];
+		return this.map[x + this.size*y];
 	}
 	
 	public void set(int x, int y, int val) {
-		this.map[(int)(x + this.size*y)] = val;
+		this.map[x + this.size*y] = val;
 	}
 	
-	public void generate(int roughness) {
+	public void generate(double roughness) {
 		this.set(0, 0, this.max);
 		this.set(this.max, 0, (this.max / 2));
 		this.set(this.max, this.max, 0);
@@ -40,11 +41,13 @@ public class Terrain {
 		this.divide(this.max, roughness);
 	}
 	
-	public void divide(int size, int roughness) {
+	public void divide(int size, double roughness) {
 		int x,y;
-		int half = size/2;
-		int scale = roughness * size;
+		int half = size / 2;
+		double scale = roughness * size;
 		if (half < 1) return;
+		
+		System.out.println(scale);
 		
 		for(y = half; y < this.max; y+= size) {
 			for (x = half; x < this.max; x += size) {
@@ -79,7 +82,7 @@ public class Terrain {
 		return sum/valid.size();
 	}
 	
-	public void square(int x, int y, int sze, int offset) {		
+	public void square(int x, int y, int sze, double offset) {		
 		int[] toAvg = {
 		           this.get(x - sze, y - sze),   // upper left
 		           this.get(x + sze, y - sze),   // upper right
@@ -88,10 +91,10 @@ public class Terrain {
 		        };
 		
 		int ave = this.average(toAvg);
-		this.set(x, y, ave + offset);
+		this.set(x, y, ave + (int)offset);
 	}
 	
-	public void diamond(int x, int y, int sze, int offset) {
+	public void diamond(int x, int y, int sze, double offset) {
 		int[] toAvg = {
 		           this.get(x, y - sze),   // upper left
 		           this.get(x + sze, y),   // upper right
@@ -100,10 +103,13 @@ public class Terrain {
 		        };
 		
 		int ave = this.average(toAvg);
-		this.set(x, y, ave + offset);
+		this.set(x, y, ave + (int)offset);
 	}
 	
-	public void draw() {
+	public void draw(int width, int height) {
+		this.width = width;
+		this.height = height;
+		
 		double waterVal = this.size * 0.3;
 		
 		 for (int y = 0; y < this.size; y++) {
@@ -112,27 +118,36 @@ public class Terrain {
 		        Point top = this.project(x, y, val);
 		        Point bottom = this.project(x + 1, y, 0);
 		        Point water = this.project(x, y, waterVal);
-		        String style = this.brightness(x, y, this.get(x + 1, y) - val);
+		        Color style = this.brightness(x, y, this.get(x + 1, y) - val);
 		
-		        this.rect(top, bottom, style);
-		        this.rect(water, bottom, "rgba(50, 150, 200, 0.15)");
+		        Rectangle topRect = new Rectangle(top, bottom, style);
+		        Rectangle waterRect = new Rectangle(water, bottom, new Color(50,150,200, 38));
+		        	        
+		        this.generator.addRectangle(topRect);
+		        this.generator.addRectangle(waterRect);
 		      }
 		 }
 	}
 	
-	public Point project(int flatX, int flatY, double flatZ) {
+	public Point project(int flatX, int flatY, double flatZ) {		
+        Point point = iso(flatX, flatY);
+        double x0 = this.width * 0.5;
+        double y0 = this.height * 0.2;
+        double z = this.size * 0.5 - flatZ + point.y * 0.75;
+        double x = (point.x - this.size * 0.5) * 6;
+        double y = (this.size - point.y) * 0.005 + 1;
 		
-		
-		return new Point();
+		return new Point( (int)(x0 + x / y), (int)(y0 + z / y));
 	}
 	
-	public String brightness(int x, int y, int slope) {
-		
-		return " ";
-	}
+    public Point iso(int x, int y) {
+    	return new Point((int)(0.5 * (this.size + x - y)),(int)(0.5 * (x + y)));
+    }
 	
-	public void rect(Point a, Point b, String style) {
-		
+	public Color brightness(int x, int y, int slope) {
+        if (x == this.max || y == this.max) return Color.BLACK;
+        int b = (slope * 50) + 128;
+        return new Color(255, 255, 255);
 	}
-	
+		
 }
