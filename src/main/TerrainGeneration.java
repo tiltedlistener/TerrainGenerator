@@ -20,7 +20,7 @@ public class TerrainGeneration extends JFrame {
 		
 		rectList = new ArrayList<Rectangle>();
 		
-		Terrain terrain = new Terrain(9, this);
+		Terrain terrain = new Terrain(6, this);
 		terrain.generate(0.7);
 		terrain.draw(640, 640);
 		
@@ -36,7 +36,7 @@ public class TerrainGeneration extends JFrame {
 		for(int i=0;i<rectList.size();i++) {
 			Rectangle current = rectList.get(i);
 			g.setColor(current.c);
-			g.fillRect(current.xOrg(), current.yOrg(), current.width(), current.height());
+			g.fillRect((int)current.xOrg(), (int)current.yOrg(), (int)current.width(), (int)current.height());
 		}
 	}
 
