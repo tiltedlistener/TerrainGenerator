@@ -20,7 +20,7 @@ public class TerrainGeneration extends JFrame {
 		
 		rectList = new ArrayList<Rectangle>();
 		
-		Terrain terrain = new Terrain(6, this);
+		Terrain terrain = new Terrain(5, this);
 		terrain.generate(0.7);
 		terrain.draw(640, 640);
 		

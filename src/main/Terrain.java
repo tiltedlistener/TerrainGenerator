@@ -5,7 +5,7 @@ import java.awt.Color;
 
 public class Terrain {
 
-	public double[] map;
+	public int[] map;
 	public int size;
 	public int max;
 	public int width;
@@ -20,20 +20,20 @@ public class Terrain {
 		this.generator = _generator;
 		this.size = (int)Math.pow(2, detail) + 1; 		
 		this.max = this.size - 1;
-		this.map = new double[(this.size * this.size)];
+		this.map = new int[(this.size * this.size)];
 	}
 	
-	public double get(int x, int y) {
-		if (x<0 || x > this.max || y<0 || y > this.max) return -1;
+	public int get(int x, int y) {
+		if ((x < 0 || x > this.max) || (y<0 || y > this.max)) return -1;
 		return this.map[x + this.size*y];
 	}
 	
-	public void set(int x, int y, double val) {
+	public void set(int x, int y, int val) {
 		this.map[x + this.size*y] = val;
 	}
 	
 	public void generate(double roughness) {
-		this.set(0, 0, (this.max / 2));
+		this.set(0, 0, (this.max/2));
 		this.set(this.max, 0, (this.max / 2));
 		this.set(this.max, this.max, (this.max / 2));
 		this.set(0, this.max, (this.max / 2));
@@ -41,71 +41,65 @@ public class Terrain {
 		this.divide(this.max, roughness);
 	}
 	
-	public void divide(int size, double roughness) {	
-		
+	public void divide(int size, double roughness) {
 		int x,y;
 		int half = size / 2;
 		double scale = roughness * size;
-		
 		if (half < 1) return;
 		
 		for(y = half; y < this.max; y+= size) {
 			for (x = half; x < this.max; x += size) {
-				square(x,y, half, rand.nextFloat() * scale * 2 - scale);
+				square(x, y, half, rand.nextFloat() * scale * 2 - scale);
 			}
 		}
 		
-		/**
 		for (y = 0; y <= this.max; y+=half) {
 			for (x = (y+half) % size; x <= this.max; x += size) {
-				diamond(x, y, half, rand.nextFloat() * scale * 2 * - scale);
+				diamond(x, y, half, rand.nextFloat() * scale * 2 - scale);
 			}
 		}
-		**/
 		
 		this.divide(size / 2, roughness);
 	}
 	
-	public void square(int x, int y, int sze, double offset) {		
-		System.out.println(this.get(x - sze, y - sze));
-		double[] toAvg = {
+	public void square(int x, int y, int sze, double offset) {	
+		int[] toAvg = {
 		           this.get(x - sze, y - sze),   // upper left
 		           this.get(x + sze, y - sze),   // upper right
 		           this.get(x + sze, y + sze),   // lower right
 		           this.get(x - sze, y + sze)    // lower left
 		        };
 		
-		double ave = this.average(toAvg);		
+		int ave = this.average(toAvg);		
 		this.set(x, y, ave + (int)offset);
 	}
 	
 	public void diamond(int x, int y, int sze, double offset) {
-		double[] toAvg = {
+		int[] toAvg = {
 		           this.get(x, y - sze),   // upper left
 		           this.get(x + sze, y),   // upper right
 		           this.get(x, y + sze),   // lower right
 		           this.get(x - sze, y)    // lower left
-		        };
+		       };
 		
-		double ave = this.average(toAvg);
-		this.set(x, y, ave + offset);
+		int ave = this.average(toAvg);
+		this.set(x, y, ave + (int)offset);
 	}
 	
-	public double average(double[] values) {
+	public int average(int[] values) {
 		int length = values.length;
 	
-		ArrayList<Double> valid = new ArrayList<Double>();
+		List<Integer> valid = new ArrayList<Integer>();
 		for(int i=0;i<length;i++) {
 			if (values[i] != -1) {
 				valid.add(values[i]);
 			}
 		}
-		
 		int sum = 0;
 		for(int j=0;j<valid.size();j++) {
 			sum+= valid.get(j);
 		}
-				
+		
 		return sum/valid.size();
 	}	
 	
@@ -117,7 +111,7 @@ public class Terrain {
 		
 		 for (int y = 0; y < this.size; y++) {
 		      for (int x = 0; x < this.size; x++) {
-		        double val = this.get(x, y);
+		        int val = this.get(x, y);
 		        Point top = this.project(x, y, val);
 		        Point bottom = this.project(x + 1, y, 0);
 		        Point water = this.project(x, y, waterVal);
@@ -126,7 +120,7 @@ public class Terrain {
 		        Rectangle topRect = new Rectangle(top, bottom, style);
 		        Rectangle waterRect = new Rectangle(water, bottom, new Color(50,150,200, 38));
 		        	        
-		       //  this.generator.addRectangle(topRect);
+		        this.generator.addRectangle(topRect);
 		        this.generator.addRectangle(waterRect);
 		      }
 		 }
@@ -140,16 +134,16 @@ public class Terrain {
         double x = (point.x - this.size * 0.5) * 6;
         double y = (this.size - point.y) * 0.005 + 1;
 		
-		return new Point( (x0 + x / y), (y0 + z / y));
+		return new Point( (int)(x0 + x / y), (int)(y0 + z / y));
 	}
 	
     public Point iso(int x, int y) {
-    	return new Point((0.5 * (this.size + x - y)),(0.5 * (x + y)));
+    	return new Point((int)(0.5 * (this.size + x - y)),(int)(0.5 * (x + y)));
     }
 	
-	public Color brightness(int x, int y, double slope) {
+	public Color brightness(int x, int y, int slope) {
         if (x == this.max || y == this.max) return Color.BLACK;
-        int b = ((int)slope * 50) + 128;
+        int b = (slope * 50) + 128;
         return new Color(255, 255, 255);
 	}
 		
