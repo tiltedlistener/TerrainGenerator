@@ -14,19 +14,19 @@ public class Rectangle {
 		this.c = _c;
 	}
 	
-	public double xOrg() {
+	public int xOrg() {
 		return a.x;
 	}
 	
-	public double yOrg() {
+	public int yOrg() {
 		return a.y;
 	}
 	
-	public double width() {
+	public int width() {
 		return b.x - a.x;
 	}
 	
-	public double height() {
+	public int height() {
 		return b.y - a.y;
 	}
 	

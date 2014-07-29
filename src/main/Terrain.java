@@ -144,7 +144,12 @@ public class Terrain {
 	public Color brightness(int x, int y, int slope) {
         if (x == this.max || y == this.max) return Color.BLACK;
         int b = (slope * 50) + 128;
-        return new Color(255, 255, 255);
+        if (b < 0) {
+        	b = 0;
+        } else if (b > 255) {
+        	b = 255;
+        }
+        return new Color(b,b,b);
 	}
 		
 }

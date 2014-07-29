@@ -16,13 +16,13 @@ public class TerrainGeneration extends JFrame {
 	
 	public TerrainGeneration() {
 		super("Terrain!");
-		setSize(640,640);
+		setSize(1024, 1024);
 		
 		rectList = new ArrayList<Rectangle>();
 		
-		Terrain terrain = new Terrain(5, this);
+		Terrain terrain = new Terrain(8, this);
 		terrain.generate(0.7);
-		terrain.draw(640, 640);
+		terrain.draw(1024, 1024);
 		
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -36,7 +36,7 @@ public class TerrainGeneration extends JFrame {
 		for(int i=0;i<rectList.size();i++) {
 			Rectangle current = rectList.get(i);
 			g.setColor(current.c);
-			g.fillRect((int)current.xOrg(), (int)current.yOrg(), (int)current.width(), (int)current.height());
+			g.fillRect(current.xOrg(), current.yOrg(), current.width(), current.height());
 		}
 	}
 
